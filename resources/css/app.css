@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+    /* Brand Colors */
+    --color-brand-primary: #FF5252;    /* Coral Red */
+    --color-brand-secondary: #26C6DA;  /* Turquoise */
+    --color-brand-dark: #121212;       /* Deep Matte Black */
+    --color-brand-surface: #F8F9FA;    /* Soft Surface White */
+    
+    /* Gradients */
+    --bg-gradient-premium: linear-gradient(135deg, #FF5252 0%, #FF1744 100%);
+    
+    /* Shadows */
+    --shadow-premium: 0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 4px 15px -5px rgba(0, 0, 0, 0.05);
+}
+
+@layer base {
+    body {
+        @apply bg-brand-surface text-brand-dark antialiased;
+        font-family: 'Inter', sans-serif;
+    }
+}
+
+@layer components {
+    .btn-premium {
+        @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-premium;
+        background: var(--bg-gradient-premium);
+        color: white;
+    }
+}
