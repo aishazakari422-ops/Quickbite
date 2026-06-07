@@ -15,6 +15,11 @@ class VendorController extends Controller
      */
     public function create()
     {
+        // Only allow vendors to setup a shop
+        if (Auth::user()->role !== 'vendor') {
+            return redirect()->route('dashboard')->with('error', 'Only vendors can set up a shop.');
+        }
+
         return Inertia::render('Vendor/Setup');
     }
 

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['category_id', 'name', 'description', 'price', 'image_url', 'is_available'])]
+#[Fillable(['category_id', 'name', 'description', 'price', 'image_url', 'preparation_time', 'is_available'])]
 class MenuItem extends Model
 {
     use HasFactory;

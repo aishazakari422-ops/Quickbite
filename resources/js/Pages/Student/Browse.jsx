@@ -1,11 +1,12 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
-import { Search, MapPin, Star, ChevronRight, ShoppingCart } from 'lucide-react';
+import { Search, MapPin, Star, ChevronRight, ShoppingCart, X, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Browse({ vendors }) {
     const [selectedVendor, setSelectedVendor] = useState(null);
     const [cart, setCart] = useState([]);
+    const [showCart, setShowCart] = useState(false);
 
     const addToCart = (item, vendor) => {
         // If adding from a different vendor, clear the cart (typical food app logic)
@@ -23,6 +24,10 @@ export default function Browse({ vendors }) {
             }
             return [...prevCart, { ...item, quantity: 1, vendor_id: vendor.id, vendor_name: vendor.name }];
         });
+    };
+
+    const removeFromCart = (itemId) => {
+        setCart(prevCart => prevCart.filter(item => item.id !== itemId));
     };
 
     const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -129,10 +134,20 @@ export default function Browse({ vendors }) {
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                     {category.items.map((item) => (
                                                         <div key={item.id} className="bg-brand-surface p-6 rounded-2xl border border-gray-100 hover:border-brand-primary/30 transition-all group">
+                                                            {item.image_url && (
+                                                                <div className="w-full h-40 mb-4 rounded-xl overflow-hidden bg-gray-100">
+                                                                    <img src={item.image_url} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                                                </div>
+                                                            )}
                                                             <div className="flex justify-between items-start">
                                                                 <div className="flex-1">
                                                                     <h5 className="font-bold text-brand-dark group-hover:text-brand-primary transition-colors">{item.name}</h5>
                                                                     <p className="text-xs text-gray-500 mt-1 line-clamp-2">{item.description}</p>
+                                                                    {item.preparation_time && (
+                                                                        <span className="inline-block mt-2 text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded-md">
+                                                                            ⏱ Takes ~{item.preparation_time} mins
+                                                                        </span>
+                                                                    )}
                                                                 </div>
                                                                 <p className="font-black text-brand-dark">₦{item.price}</p>
                                                             </div>
@@ -155,10 +170,76 @@ export default function Browse({ vendors }) {
                 )}
             </div>
 
+            {/* Cart Modal Overlay */}
+            {showCart && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                    <div className="bg-white w-full max-w-lg rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                        <div className="p-8 bg-brand-dark text-white flex justify-between items-center">
+                            <div>
+                                <h3 className="text-2xl font-black">Your <span className="text-brand-primary">Basket</span></h3>
+                                <p className="text-gray-400 text-sm">{cart[0]?.vendor_name}</p>
+                            </div>
+                            <button onClick={() => setShowCart(false)} className="bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors">
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        
+                        <div className="p-8 max-h-[60vh] overflow-y-auto space-y-6">
+                            {cart.map((item) => (
+                                <div key={item.id} className="flex justify-between items-center group">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-brand-surface rounded-xl flex items-center justify-center font-black text-brand-primary">
+                                            {item.quantity}x
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-brand-dark">{item.name}</p>
+                                            <p className="text-xs text-gray-400">₦{item.price.toLocaleString()} each</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <p className="font-black text-brand-dark">₦{(item.price * item.quantity).toLocaleString()}</p>
+                                        <button 
+                                            onClick={() => removeFromCart(item.id)}
+                                            className="text-gray-300 hover:text-red-500 transition-colors"
+                                        >
+                                            <Trash2 className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="p-8 border-t border-gray-100 bg-brand-surface">
+                            <div className="flex justify-between items-center mb-6">
+                                <span className="text-gray-500 font-bold uppercase tracking-widest text-xs">Total Amount</span>
+                                <span className="text-3xl font-black text-brand-dark">₦{cartTotal.toLocaleString()}</span>
+                            </div>
+                            <div className="flex gap-4">
+                                <button 
+                                    onClick={() => setCart([])}
+                                    className="flex-1 py-4 text-gray-400 font-bold hover:text-red-500 transition-colors"
+                                >
+                                    Empty Cart
+                                </button>
+                                <button 
+                                    onClick={handleCheckout}
+                                    className="flex-[2] btn-premium py-4"
+                                >
+                                    Place Order Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Floating Cart Summary */}
-            {cart.length > 0 && (
+            {cart.length > 0 && !showCart && (
                 <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-full max-w-md px-4 animate-in slide-in-from-bottom duration-500 z-50">
-                    <div className="bg-brand-dark text-white rounded-3xl p-6 shadow-2xl flex items-center justify-between border border-white/10">
+                    <div 
+                        onClick={() => setShowCart(true)}
+                        className="bg-brand-dark text-white rounded-3xl p-6 shadow-2xl flex items-center justify-between border border-white/10 cursor-pointer hover:scale-[1.02] transition-transform"
+                    >
                         <div className="flex items-center gap-4">
                             <div className="relative">
                                 <ShoppingCart className="w-8 h-8 text-brand-primary" />
@@ -167,15 +248,14 @@ export default function Browse({ vendors }) {
                                 </span>
                             </div>
                             <div>
-                                <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Your Order</p>
+                                <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Review Order</p>
                                 <p className="text-xl font-black">₦{cartTotal.toLocaleString()}</p>
                             </div>
                         </div>
                         <button 
-                            className="bg-brand-primary px-8 py-3 rounded-2xl font-black text-sm hover:scale-105 transition-transform"
-                            onClick={handleCheckout}
+                            className="bg-brand-primary px-8 py-3 rounded-2xl font-black text-sm"
                         >
-                            Checkout
+                            View Cart
                         </button>
                     </div>
                 </div>

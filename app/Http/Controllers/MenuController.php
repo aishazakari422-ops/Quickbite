@@ -59,13 +59,25 @@ class MenuController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'preparation_time' => 'nullable|integer|min:1',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
+
+        $imageUrl = null;
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $file->move(public_path('uploads/menu'), $filename);
+            $imageUrl = '/uploads/menu/' . $filename;
+        }
 
         MenuItem::create([
             'category_id' => $request->category_id,
             'name' => $request->name,
             'description' => $request->description,
             'price' => $request->price,
+            'preparation_time' => $request->preparation_time,
+            'image_url' => $imageUrl,
             'is_available' => true,
         ]);
 

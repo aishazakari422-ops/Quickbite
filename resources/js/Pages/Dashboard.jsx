@@ -1,9 +1,25 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import { Utensils, ShoppingBag, Clock, Star } from 'lucide-react';
 
-export default function Dashboard({ hasShop, orders = [] }) {
+export default function Dashboard({ hasShop, orders = [], analytics = null }) {
     const user = usePage().props.auth.user;
+
+    const updateOrderStatus = (orderId, newStatus) => {
+        router.patch(route('vendor.order.status.update', orderId), { status: newStatus }, {
+            preserveScroll: true
+        });
+    };
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'pending': return 'bg-red-100 text-red-700';
+            case 'preparing': return 'bg-yellow-100 text-yellow-700';
+            case 'ready': return 'bg-brand-secondary/20 text-brand-secondary';
+            case 'completed': return 'bg-gray-100 text-gray-500';
+            default: return 'bg-gray-100 text-gray-700';
+        }
+    };
 
     return (
         <AuthenticatedLayout
@@ -43,13 +59,13 @@ export default function Dashboard({ hasShop, orders = [] }) {
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {orders.map((order) => (
-                                    <div key={order.id} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-premium transition-shadow">
+                                    <div key={order.id} className={`bg-white rounded-3xl shadow-sm border overflow-hidden hover:shadow-premium transition-shadow ${order.status === 'completed' ? 'opacity-50 border-gray-100' : 'border-gray-200'}`}>
                                         <div className="p-6 bg-brand-surface border-b border-gray-100 flex justify-between items-center">
                                             <div>
                                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-tighter">Order #{order.id}</p>
                                                 <p className="font-black text-brand-dark">{order.user.name}</p>
                                             </div>
-                                            <span className="bg-yellow-400/10 text-yellow-700 text-[10px] font-black px-2 py-1 rounded-full uppercase">
+                                            <span className={`text-[10px] font-black px-3 py-1.5 rounded-full uppercase ${getStatusColor(order.status)}`}>
                                                 {order.status}
                                             </span>
                                         </div>
@@ -62,11 +78,35 @@ export default function Dashboard({ hasShop, orders = [] }) {
                                                     <span className="font-bold text-brand-dark">₦{(item.price * item.quantity).toLocaleString()}</span>
                                                 </div>
                                             ))}
-                                            <div className="pt-3 border-t border-gray-50 flex justify-between items-center">
-                                                <p className="font-black text-lg text-brand-primary">Total: ₦{order.total_price.toLocaleString()}</p>
-                                                <button className="px-4 py-2 bg-brand-primary text-white text-xs font-black rounded-xl hover:scale-105 transition-transform">
-                                                    Mark Ready
-                                                </button>
+                                            <div className="pt-4 border-t border-gray-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                                <p className="font-black text-lg text-brand-primary">Total: ₦{order.total_amount ? Number(order.total_amount).toLocaleString() : 0}</p>
+                                                
+                                                <div className="flex gap-2 w-full sm:w-auto">
+                                                    {order.status === 'pending' && (
+                                                        <button 
+                                                            onClick={() => updateOrderStatus(order.id, 'preparing')}
+                                                            className="w-full sm:w-auto px-4 py-2 bg-yellow-500 text-white text-xs font-black rounded-xl hover:scale-105 transition-transform"
+                                                        >
+                                                            Start Cooking
+                                                        </button>
+                                                    )}
+                                                    {order.status === 'preparing' && (
+                                                        <button 
+                                                            onClick={() => updateOrderStatus(order.id, 'ready')}
+                                                            className="w-full sm:w-auto px-4 py-2 bg-brand-secondary text-white text-xs font-black rounded-xl hover:scale-105 transition-transform"
+                                                        >
+                                                            Mark Ready
+                                                        </button>
+                                                    )}
+                                                    {order.status === 'ready' && (
+                                                        <button 
+                                                            onClick={() => updateOrderStatus(order.id, 'completed')}
+                                                            className="w-full sm:w-auto px-4 py-2 bg-gray-800 text-white text-xs font-black rounded-xl hover:scale-105 transition-transform"
+                                                        >
+                                                            Picked Up
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -95,38 +135,76 @@ export default function Dashboard({ hasShop, orders = [] }) {
                     </div>
                 </div>
 
-                {/* Quick Stats / Actions */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:border-brand-primary/50 transition-colors cursor-pointer group">
-                        <div className="bg-brand-primary/10 p-4 rounded-xl group-hover:bg-brand-primary/20 transition-colors">
-                            <ShoppingBag className="w-6 h-6 text-brand-primary" />
-                        </div>
-                        <div>
-                            <p className="text-sm text-gray-500 font-medium">Recent Orders</p>
-                            <p className="text-xl font-bold text-brand-dark">0 Orders</p>
+                {/* Student Orders Section */}
+                {user.role === 'student' && orders.length > 0 && (
+                    <div className="space-y-6">
+                        <h3 className="text-2xl font-black text-brand-dark flex items-center gap-2">
+                            Your <span className="text-brand-primary">Orders</span>
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {orders.map((order) => (
+                                <div key={order.id} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                                    <div className="p-6 bg-brand-surface border-b border-gray-100 flex justify-between items-center">
+                                        <div>
+                                            <p className="text-xs font-bold text-gray-400 uppercase tracking-tighter">Order #{order.id}</p>
+                                            <p className="font-black text-brand-dark">{order.vendor.name}</p>
+                                        </div>
+                                        <span className={`text-[10px] font-black px-3 py-1.5 rounded-full uppercase ${getStatusColor(order.status)}`}>
+                                            {order.status}
+                                        </span>
+                                    </div>
+                                    <div className="p-6 space-y-3">
+                                        {order.items.map((item) => (
+                                            <div key={item.id} className="flex justify-between text-sm">
+                                                <span className="text-gray-600">
+                                                    <span className="font-bold text-brand-dark">{item.quantity}x</span> {item.menu_item.name}
+                                                </span>
+                                            </div>
+                                        ))}
+                                        <div className="pt-4 border-t border-gray-50 flex justify-between items-center">
+                                            <p className="font-black text-lg text-brand-primary">Total: ₦{order.total_amount ? Number(order.total_amount).toLocaleString() : 0}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
+                )}
 
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:border-brand-secondary/50 transition-colors cursor-pointer group">
-                        <div className="bg-brand-secondary/10 p-4 rounded-xl group-hover:bg-brand-secondary/20 transition-colors">
-                            <Clock className="w-6 h-6 text-brand-secondary" />
+                {/* Vendor Analytics */}
+                {user.role === 'vendor' && hasShop && analytics && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:border-brand-primary/50 transition-colors cursor-pointer group">
+                            <div className="bg-brand-primary/10 p-4 rounded-xl group-hover:bg-brand-primary/20 transition-colors">
+                                <ShoppingBag className="w-6 h-6 text-brand-primary" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500 font-medium">Active Orders</p>
+                                <p className="text-xl font-bold text-brand-dark">{analytics.active_orders} Orders</p>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-sm text-gray-500 font-medium">Wait Time</p>
-                            <p className="text-xl font-bold text-brand-dark">~15 Mins</p>
-                        </div>
-                    </div>
 
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:border-yellow-400/50 transition-colors cursor-pointer group">
-                        <div className="bg-yellow-400/10 p-4 rounded-xl group-hover:bg-yellow-400/20 transition-colors">
-                            <Star className="w-6 h-6 text-yellow-600" />
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:border-brand-secondary/50 transition-colors cursor-pointer group">
+                            <div className="bg-brand-secondary/10 p-4 rounded-xl group-hover:bg-brand-secondary/20 transition-colors">
+                                <Utensils className="w-6 h-6 text-brand-secondary" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500 font-medium">Total Revenue</p>
+                                <p className="text-xl font-bold text-brand-dark">₦{Number(analytics.total_revenue).toLocaleString()}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-sm text-gray-500 font-medium">Top Rated</p>
-                            <p className="text-xl font-bold text-brand-dark">4.8 Rating</p>
+
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:border-yellow-400/50 transition-colors cursor-pointer group">
+                            <div className="bg-yellow-400/10 p-4 rounded-xl group-hover:bg-yellow-400/20 transition-colors">
+                                <Star className="w-6 h-6 text-yellow-600" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500 font-medium">Top Rated</p>
+                                <p className="text-xl font-bold text-brand-dark">4.8 Rating</p>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
         </AuthenticatedLayout>
     );

@@ -27,7 +27,7 @@ class OrderController extends Controller
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'vendor_id' => $request->vendor_id,
-                'total_price' => $request->total_price,
+                'total_amount' => $request->total_price,
                 'status' => 'pending',
             ]);
 
@@ -42,5 +42,23 @@ class OrderController extends Controller
 
             return redirect()->route('dashboard')->with('message', 'Order placed successfully!');
         });
+    }
+
+    /**
+     * Update the status of an order.
+     */
+    public function updateStatus(Request $request, Order $order)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,preparing,ready,completed,cancelled',
+        ]);
+
+        // Ensure the vendor owns this order
+        if (Auth::user()->vendor && Auth::user()->vendor->id === $order->vendor_id) {
+            $order->update(['status' => $request->status]);
+            return back()->with('message', 'Order status updated to ' . $request->status . '!');
+        }
+
+        return back()->with('error', 'Unauthorized action.');
     }
 }

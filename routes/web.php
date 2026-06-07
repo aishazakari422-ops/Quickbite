@@ -31,6 +31,16 @@ Route::get('/dashboard', function () {
             ->with(['user', 'items.menuItem'])
             ->latest()
             ->get();
+            
+        $data['analytics'] = [
+            'total_revenue' => Order::where('vendor_id', $user->vendor->id)->where('status', 'completed')->sum('total_amount'),
+            'active_orders' => Order::where('vendor_id', $user->vendor->id)->whereIn('status', ['pending', 'preparing', 'ready'])->count(),
+        ];
+    } elseif ($user->role === 'student') {
+        $data['orders'] = Order::where('user_id', $user->id)
+            ->with(['vendor', 'items.menuItem'])
+            ->latest()
+            ->get();
     }
 
     return Inertia::render('Dashboard', $data);
@@ -46,6 +56,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/order', [OrderController::class, 'store'])->name('order.store');
 
     // Vendor Routes
+    Route::patch('/vendor/order/{order}/status', [OrderController::class, 'updateStatus'])->name('vendor.order.status.update');
     Route::get('/vendor/setup', [VendorController::class, 'create'])->name('vendor.setup');
     Route::post('/vendor/setup', [VendorController::class, 'store'])->name('vendor.store');
 
