@@ -66,7 +66,7 @@ export default function Welcome({ auth }) {
                             <Link href={route('register')} className="w-full sm:w-auto btn-premium px-10 py-4 text-lg shadow-premium hover:shadow-premium-hover hover:-translate-y-1 transition-all text-center">
                                 Order Food
                             </Link>
-                            <Link href={route('vendor.setup')} className="w-full sm:w-auto px-10 py-4 text-lg font-bold text-brand-dark bg-white border-2 border-gray-200 rounded-2xl hover:border-brand-primary hover:text-brand-primary transition-all text-center">
+                            <Link href={auth.user ? route('vendor.setup') : route('register')} className="w-full sm:w-auto px-10 py-4 text-lg font-bold text-brand-dark bg-white border-2 border-gray-200 rounded-2xl hover:border-brand-primary hover:text-brand-primary transition-all text-center">
                                 Become a Vendor
                             </Link>
                         </div>
@@ -341,7 +341,7 @@ export default function Welcome({ auth }) {
                     <div>
                         <h4 className="font-black text-lg mb-6">For Vendors</h4>
                         <ul className="space-y-4 font-medium text-gray-400">
-                            <li><Link href={route('vendor.setup')} className="hover:text-brand-primary transition-colors">Join as Vendor</Link></li>
+                            <li><Link href={auth.user ? route('vendor.setup') : route('register')} className="hover:text-brand-primary transition-colors">Join as Vendor</Link></li>
                             <li><Link href={route('login')} className="hover:text-brand-primary transition-colors">Vendor Dashboard</Link></li>
                             <li><a href="#" className="hover:text-brand-primary transition-colors">Success Stories</a></li>
                             <li><a href="#" className="hover:text-brand-primary transition-colors">Guidelines</a></li>

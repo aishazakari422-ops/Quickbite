@@ -109,53 +109,82 @@ export default function Browse({ vendors }) {
                 {selectedVendor && (
                     <div className="lg:col-span-8 space-y-6 animate-in slide-in-from-right duration-300">
                         <div className="bg-white rounded-3xl shadow-premium border border-gray-100 overflow-hidden">
-                            <div className="p-8 bg-brand-dark text-white relative">
+                            {/* Vendor Header */}
+                            <div className="p-6 md:p-8 bg-brand-dark text-white relative">
                                 <button 
                                     onClick={() => setSelectedVendor(null)}
-                                    className="lg:hidden absolute top-4 right-4 bg-white/10 p-2 rounded-full hover:bg-white/20"
+                                    className="absolute top-4 right-4 bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors"
                                 >
-                                    <ChevronRight className="w-6 h-6 rotate-180" />
+                                    <X className="w-5 h-5" />
                                 </button>
-                                <h3 className="text-3xl font-black mb-2">{selectedVendor.name}</h3>
-                                <p className="text-gray-400 max-w-lg">{selectedVendor.description}</p>
+                                <div className="flex items-center gap-4 mb-2">
+                                    <div className="bg-brand-primary/20 p-3 rounded-2xl">
+                                        <MapPin className="w-6 h-6 text-brand-primary" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-2xl md:text-3xl font-black">{selectedVendor.name}</h3>
+                                        <p className="text-gray-400 text-sm mt-1 max-w-lg">{selectedVendor.description}</p>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div className="p-8">
+                            {/* Menu Items */}
+                            <div className="p-6 md:p-8">
                                 {selectedVendor.categories.length === 0 ? (
                                     <p className="text-center py-10 text-gray-400 italic">This vendor hasn't added any menu items yet.</p>
                                 ) : (
-                                    <div className="space-y-10">
+                                    <div className="space-y-8">
                                         {selectedVendor.categories.map((category) => (
                                             <div key={category.id}>
-                                                <h4 className="text-sm font-black uppercase tracking-widest text-brand-primary mb-6 flex items-center gap-2">
-                                                    <span className="w-8 h-px bg-brand-primary/30"></span>
+                                                <h4 className="text-xs font-black uppercase tracking-[0.2em] text-brand-primary mb-4 flex items-center gap-3">
+                                                    <span className="w-6 h-px bg-brand-primary/40"></span>
                                                     {category.name}
+                                                    <span className="text-gray-300 font-bold normal-case tracking-normal">({category.items.length})</span>
                                                 </h4>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="space-y-3">
                                                     {category.items.map((item) => (
-                                                        <div key={item.id} className="bg-brand-surface p-6 rounded-2xl border border-gray-100 hover:border-brand-primary/30 transition-all group">
+                                                        <div 
+                                                            key={item.id} 
+                                                            className="flex items-center gap-4 p-4 rounded-2xl border border-gray-100 bg-brand-surface hover:border-brand-primary/30 hover:shadow-sm transition-all group"
+                                                        >
+                                                            {/* Thumbnail */}
                                                             {item.image_url && (
-                                                                <div className="w-full h-40 mb-4 rounded-xl overflow-hidden bg-gray-100">
-                                                                    <img src={item.image_url} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                                                <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+                                                                    <img 
+                                                                        src={item.image_url} 
+                                                                        alt={item.name} 
+                                                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                                                                    />
                                                                 </div>
                                                             )}
-                                                            <div className="flex justify-between items-start">
-                                                                <div className="flex-1">
-                                                                    <h5 className="font-bold text-brand-dark group-hover:text-brand-primary transition-colors">{item.name}</h5>
-                                                                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{item.description}</p>
+
+                                                            {/* Info */}
+                                                            <div className="flex-1 min-w-0">
+                                                                <h5 className="font-bold text-brand-dark group-hover:text-brand-primary transition-colors text-sm md:text-base">
+                                                                    {item.name}
+                                                                </h5>
+                                                                <p className="text-xs text-gray-400 mt-1 line-clamp-1">
+                                                                    {item.description}
+                                                                </p>
+                                                                <div className="flex items-center gap-3 mt-2">
+                                                                    <span className="font-black text-brand-dark text-sm md:text-base">
+                                                                        ₦{Number(item.price).toLocaleString()}
+                                                                    </span>
                                                                     {item.preparation_time && (
-                                                                        <span className="inline-block mt-2 text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded-md">
-                                                                            ⏱ Takes ~{item.preparation_time} mins
+                                                                        <span className="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md">
+                                                                            ⏱ ~{item.preparation_time} min
                                                                         </span>
                                                                     )}
                                                                 </div>
-                                                                <p className="font-black text-brand-dark">₦{item.price}</p>
                                                             </div>
+
+                                                            {/* Add Button */}
                                                             <button 
                                                                 onClick={() => addToCart(item, selectedVendor)}
-                                                                className="w-full mt-4 py-2 bg-white border border-gray-200 rounded-xl font-bold text-sm text-brand-dark hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all flex items-center justify-center gap-2"
+                                                                className="flex-shrink-0 w-10 h-10 md:w-auto md:h-auto md:px-5 md:py-2.5 bg-white border border-gray-200 rounded-xl font-bold text-sm text-brand-dark hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all flex items-center justify-center gap-2"
                                                             >
-                                                                <ShoppingCart className="w-4 h-4" /> Add to Cart
+                                                                <ShoppingCart className="w-4 h-4" />
+                                                                <span className="hidden md:inline">Add</span>
                                                             </button>
                                                         </div>
                                                     ))}

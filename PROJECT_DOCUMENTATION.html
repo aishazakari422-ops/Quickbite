@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickBite - Technical Project Documentation</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --brand-primary: #f97316; /* Orange-500 */
+            --brand-primary-light: #ffedd5; /* Orange-100 */
+            --brand-dark: #0f172a; /* Slate-900 */
+            --text-main: #334155; /* Slate-700 */
+            --text-light: #64748b; /* Slate-500 */
+            --bg-light: #f8fafc; /* Slate-50 */
+            --border-color: #e2e8f0; /* Slate-200 */
+        }
+
+        /* Base Typography */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+        }
+        h1, h2, h3, h4, h5 {
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--brand-dark);
+            font-weight: 700;
+            margin-top: 0;
+        }
+
+        /* Container & Structure */
+        .doc-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 60px 80px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Cover Page Styling */
+        .cover-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 800px;
+            padding: 40px 0;
+            position: relative;
+        }
+        .cover-header {
+            border-bottom: 2px solid var(--brand-primary);
+            padding-bottom: 20px;
+        }
+        .cover-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--brand-dark);
+        }
+        .cover-logo span {
+            color: var(--brand-primary);
+        }
+        .cover-body {
+            margin: auto 0;
+        }
+        .cover-title {
+            font-size: 44px;
+            line-height: 1.15;
+            color: var(--brand-dark);
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+        .cover-subtitle {
+            font-size: 20px;
+            color: var(--text-light);
+            font-weight: 400;
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+        .cover-badge {
+            display: inline-block;
+            background-color: var(--brand-primary-light);
+            color: var(--brand-primary);
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .cover-footer {
+            border-top: 1px solid var(--border-color);
+            padding-top: 30px;
+            display: grid;
+            grid-template-cols: 1fr 1fr;
+            gap: 20px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        .meta-label {
+            font-weight: 600;
+            color: var(--brand-dark);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        /* Divider & Headings */
+        .page-break {
+            page-break-before: always;
+            margin-top: 40px;
+        }
+        .section-title {
+            font-size: 28px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .section-title::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 24px;
+            background-color: var(--brand-primary);
+            margin-right: 12px;
+            border-radius: 4px;
+        }
+        .subsection-title {
+            font-size: 18px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            color: var(--brand-dark);
+        }
+
+        /* General Styling Elements */
+        p {
+            font-size: 15px;
+            margin-bottom: 18px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+        li {
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+        code {
+            font-family: Consolas, Monaco, monospace;
+            background-color: var(--bg-light);
+            color: var(--brand-dark);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13.5px;
+            border: 1px solid var(--border-color);
+        }
+        pre {
+            background-color: var(--brand-dark);
+            color: #f8fafc;
+            padding: 16px 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            border: 1px solid var(--brand-dark);
+        }
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            border: none;
+            padding: 0;
+            font-size: 13px;
+        }
+
+        /* Callout Box */
+        .callout {
+            background-color: var(--bg-light);
+            border-left: 4px solid var(--brand-primary);
+            padding: 18px 24px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 25px;
+        }
+        .callout-title {
+            font-weight: 700;
+            color: var(--brand-dark);
+            margin-bottom: 6px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .callout p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th {
+            background-color: var(--bg-light);
+            color: var(--brand-dark);
+            font-weight: 600;
+        }
+        tr:hover {
+            background-color: rgba(248, 250, 252, 0.5);
+        }
+
+        /* ER Diagram representation */
+        .diagram-box {
+            background-color: #fafafa;
+            border: 1px dashed var(--border-color);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        /* Print Button (Only shows in browser) */
+        .print-btn-container {
+            display: flex;
+            justify-content: flex-end;
+            max-width: 900px;
+            margin: 20px auto 0 auto;
+            padding: 0 20px;
+        }
+        .print-btn {
+            background-color: var(--brand-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.2);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .print-btn:hover {
+            background-color: #ea580c;
+            transform: translateY(-1px);
+        }
+        .print-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+
+        /* Print Styles overrides */
+        @media print {
+            body {
+                background-color: #ffffff;
+                color: #000000;
+            }
+            .doc-container {
+                box-shadow: none;
+                padding: 0;
+                margin: 0;
+                max-width: 100%;
+                border: none;
+            }
+            .print-btn-container {
+                display: none;
+            }
+            .cover-page {
+                height: 100vh;
+                box-sizing: border-box;
+            }
+            .diagram-box {
+                background-color: #ffffff;
+                border: 1px solid #94a3b8;
+            }
+            pre {
+                background-color: #f8fafc;
+                color: #0f172a;
+                border: 1px solid #cbd5e1;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+            pre code {
+                color: #0f172a;
+            }
+            th {
+                background-color: #f1f5f9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .cover-badge {
+                background-color: #ffedd5 !important;
+                color: #f97316 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Print CTA -->
+    <div class="print-btn-container">
+        <button class="print-btn" onclick="window.print()">
+            <svg viewBox="0 0 24 24">
+                <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                <path d="M6 14h12v8H6z" />
+            </svg>
+            Save as PDF / Print
+        </button>
+    </div>
+
+    <!-- Main Document -->
+    <div class="doc-container">
+
+        <!-- COVER PAGE -->
+        <div class="cover-page">
+            <div class="cover-header">
+                <div class="cover-logo">Quick<span>Bite</span></div>
+            </div>
+            
+            <div class="cover-body">
+                <span class="cover-badge">Academic Project Documentation</span>
+                <h1 class="cover-title">QuickBite: Campus Food Ordering &amp; Vendor Management System</h1>
+                <h2 class="cover-subtitle">A full-stack Laravel-React application designed to bridge campus vendors and student customers with real-time tracking, beautiful visual browsing, and business analytics.</h2>
+            </div>
+            
+            <div class="cover-footer">
+                <div>
+                    <div class="meta-label">Prepared By</div>
+                    <div style="font-size: 16px; font-weight: 500; color: var(--brand-dark);">Student Aisha Zakari</div>
+                    <div>GitHub: <a href="https://github.com/aishazakari422-ops/Quickbite" target="_blank" style="color: var(--brand-primary); text-decoration: none;">github.com/aishazakari422-ops/Quickbite</a></div>
+                </div>
+                <div>
+                    <div class="meta-label">Project Details</div>
+                    <div style="font-weight: 500; color: var(--brand-dark);">Course Web Application Project</div>
+                    <div>Academic Session: 2025/2026</div>
+                    <div>Local System Date: June 2026</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 2: EXECUTIVE SUMMARY & OBJECTIVES -->
+        <div class="page-break"></div>
+        <h2 class="section-title">1. Introduction &amp; Objectives</h2>
+        
+        <h3 class="subsection-title">1.1 Executive Summary</h3>
+        <p>
+            Campus dining facilities and local student food vendors often operate under high friction. During peak hours, students face long, unproductive queues, while vendors struggle to manage ordering queues, inventory, and bookkeeping. <strong>QuickBite</strong> resolves these friction points by providing a centralized web application. 
+        </p>
+        <p>
+            Through a role-based environment, students can browse campus food shops, view high-definition food photos, configure a shopping cart, and place orders. Concurrently, vendors have dedicated portals to receive orders, update preparation states, manage categories/food items, and review visual dashboards containing revenue metrics and order analytics.
+        </p>
+
+        <h3 class="subsection-title">1.2 Core Objectives</h3>
+        <ul>
+            <li><strong>Minimize Wait Times:</strong> Students can pre-order from their classes and track order preparation, picking up their meals only when they are marked "Ready".</li>
+            <li><strong>Digitalize Vendor Operations:</strong> Provide local vendors with simple dashboard interfaces, eliminating paper-based logs and manual arithmetic.</li>
+            <li><strong>Campus Food Discovery:</strong> Help new students discover local campus cuisines, complete with menu listings, pricing, and estimated food preparation times.</li>
+            <li><strong>Establish Seamless UX:</strong> Deliver a fast-loading, single-page application feel using modern frontend routing, responsive UI layout, and clear data presentation.</li>
+        </ul>
+
+        <div class="callout">
+            <div class="callout-title">Architecture Highlight</div>
+            <p>QuickBite uses <strong>Laravel 11</strong> and <strong>Inertia.js</strong> to render a unified <strong>React (Single Page Application)</strong>. All web routes are controlled by Laravel, rendering components directly without complex client-side REST state machinery.</p>
+        </div>
+
+        <!-- PAGE 3: SYSTEM FEATURES & FLOWS -->
+        <div class="page-break"></div>
+        <h2 class="section-title">2. System Features &amp; User Personas</h2>
+        
+        <h3 class="subsection-title">2.1 Student Customer Flow</h3>
+        <p>
+            Students represent the consumer side of the platform. Their journey is designed for speed and clarity:
+        </p>
+        <ol>
+            <li><strong>Landing &amp; Search:</strong> Landing page features a prominent search bar to query specific cravings.</li>
+            <li><strong>Vendor Selection:</strong> Accessing the <code>/browse</code> route, students see a clean list of active vendors (e.g., <em>Mama Titi's Kitchen, Burger Boss, Suya Spot</em>).</li>
+            <li><strong>Menu Browsing:</strong> Selecting a vendor displays their menu items in a spacious horizontal layout (preventing vertical clustering). Each item highlights its price, ingredients, preparation time, and a matched Unsplash photo.</li>
+            <li><strong>Cart Management:</strong> Students add items, customize quantities, and view a floating cart. If they try to checkout while logged out, the system intelligently redirects them to the signup form.</li>
+            <li><strong>Order Placement &amp; Tracking:</strong> Once checked out, the order appears on their dashboard, dynamically updating as the vendor updates the preparation status.</li>
+        </ol>
+
+        <h3 class="subsection-title">2.2 Food Vendor Flow</h3>
+        <p>
+            Vendors represent the business management side. Upon login, vendor profiles have access to:
+        </p>
+        <ul>
+            <li><strong>Business Dashboard:</strong> A visual dashboard tracking two primary business health metrics:
+                <ul>
+                    <li><strong>Total Revenue:</strong> Total earnings aggregated from completed orders.</li>
+                    <li><strong>Active Orders:</strong> Count of current orders under pending, preparing, or ready states.</li>
+                </ul>
+            </li>
+            <li><strong>Live Order Processing:</strong> A queue displaying incoming orders where vendors can sequentially mark orders as <code>Preparing</code> ➔ <code>Ready for Pickup</code> ➔ <code>Completed</code>, or cancel them.</li>
+            <li><strong>Menu Management:</strong> Full CRUD capabilities for their shop. Vendors can create custom food categories (e.g. "Grills", "Snacks") and add menu items with names, descriptions, prices, prep times, and custom image uploads.</li>
+        </ul>
+
+        <!-- PAGE 4: TECH STACK & SYSTEM ARCHITECTURE -->
+        <div class="page-break"></div>
+        <h2 class="section-title">3. Technology Stack &amp; Architecture</h2>
+        
+        <p>
+            The software architecture is structured around modern full-stack web standards, emphasizing high performance and developer velocity.
+        </p>
+
+        <table style="margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th style="width: 25%">Layer</th>
+                    <th style="width: 35%">Technology</th>
+                    <th style="width: 40%">Function</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Backend Core</strong></td>
+                    <td>Laravel 11.x (PHP 8.2+)</td>
+                    <td>Handles routing, authentication/authorization, request validation, database interactions (Eloquent ORM), and session management.</td>
+                </tr>
+                <tr>
+                    <td><strong>Communication</strong></td>
+                    <td>Inertia.js 2.x</td>
+                    <td>Bridges backend controllers and React frontend components. Sends JSON responses directly instead of traditional HTML pages or standalone REST/GraphQL endpoints.</td>
+                </tr>
+                <tr>
+                    <td><strong>Frontend SPA</strong></td>
+                    <td>React 18.x</td>
+                    <td>Builds the reactive, modern user interface. Component state updates run in the client browser for an instant response feel.</td>
+                </tr>
+                <tr>
+                    <td><strong>Styling CSS</strong></td>
+                    <td>Tailwind CSS 4.0</td>
+                    <td>Utility-first framework to construct highly customized, responsive layouts. Extends with glassmorphism and animations.</td>
+                </tr>
+                <tr>
+                    <td><strong>Database</strong></td>
+                    <td>MySQL (XAMPP environment)</td>
+                    <td>Relational database storage containing users, vendor profiles, categories, menu items, and order details.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 class="subsection-title">3.1 Inertia.js Monolithic SPA Flow Diagram</h3>
+        <p>
+            Traditional SPAs require separate client router systems and complex state fetch libraries (e.g., Redux, Axios client configurations). QuickBite bypasses this using Inertia.js. Below is the transaction sequence:
+        </p>
+        <div class="diagram-box" style="text-align: left; font-family: monospace; font-size: 13px; line-height: 1.4;">
+            [Browser / Client] ──(HTTP GET Request: /browse)──&gt; [Laravel Web Router]<br>
+            [React UI State]   &lt;──(Inertia React Component + JSON)── [BrowseController]<br>
+                                                                     │<br>
+                                                       (Queries Vendor &amp; Menu Models)<br>
+                                                                     ▼<br>
+                                                                [MySQL DB]
+        </div>
+
+        <!-- PAGE 5: DATABASE SCHEMA & ENTITIES -->
+        <div class="page-break"></div>
+        <h2 class="section-title">4. Database Schema Design</h2>
+        <p>
+            QuickBite's relational database consists of 6 tables. These tables are constructed using Laravel schema migrations with foreign key constraints to ensure referential integrity.
+        </p>
+
+        <h3 class="subsection-title">4.1 Schema Tables Details</h3>
+
+        <!-- Table 1: Users -->
+        <h4 style="margin-bottom: 5px; color: var(--brand-dark);">1. Table: <code>users</code></h4>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%">Column Name</th>
+                    <th style="width: 25%">Data Type</th>
+                    <th style="width: 50%">Description / Constraints</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>id</code></td>
+                    <td>BIGINT (Primary Key)</td>
+                    <td>Auto-incrementing unique user identifier.</td>
+                </tr>
+                <tr>
+                    <td><code>name</code></td>
+                    <td>VARCHAR(255)</td>
+                    <td>User's display name.</td>
+                </tr>
+                <tr>
+                    <td><code>email</code></td>
+                    <td>VARCHAR(255)</td>
+                    <td>Unique login email address.</td>
+                </tr>
+                <tr>
+                    <td><code>role</code></td>
+                    <td>VARCHAR(50)</td>
+                    <td>User type role. Allowed values: <code>student</code>, <code>vendor</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>password</code></td>
+                    <td>VARCHAR(255)</td>
+                    <td>Hashed password string.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Table 2: Vendors -->
+        <h4 style="margin-bottom: 5px; color: var(--brand-dark); margin-top: 20px;">2. Table: <code>vendors</code></h4>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%">Column Name</th>
+                    <th style="width: 25%">Data Type</th>
+                    <th style="width: 50%">Description / Constraints</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>id</code></td>
+                    <td>BIGINT (Primary Key)</td>
+                    <td>Auto-incrementing unique vendor shop identifier.</td>
+                </tr>
+                <tr>
+                    <td><code>user_id</code></td>
+                    <td>BIGINT (Foreign Key)</td>
+                    <td>References <code>users.id</code>. Cascades on delete.</td>
+                </tr>
+                <tr>
+                    <td><code>name</code></td>
+                    <td>VARCHAR(255)</td>
+                    <td>Registered vendor shop name (e.g., Burger Boss).</td>
+                </tr>
+                <tr>
+                    <td><code>description</code></td>
+                    <td>TEXT (Nullable)</td>
+                    <td>Tagline/description of the food shop.</td>
+                </tr>
+                <tr>
+                    <td><code>is_open</code></td>
+                    <td>BOOLEAN</td>
+                    <td>Indicates if the shop is currently taking orders (Default: <code>true</code>).</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Table 3: Categories -->
+        <h4 style="margin-bottom: 5px; color: var(--brand-dark); margin-top: 20px;">3. Table: <code>categories</code></h4>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%">Column Name</th>
+                    <th style="width: 25%">Data Type</th>
+                    <th style="width: 50%">Description / Constraints</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>id</code></td>
+                    <td>BIGINT (Primary Key)</td>
+                    <td>Auto-incrementing category identifier.</td>
+                </tr>
+                <tr>
+                    <td><code>vendor_id</code></td>
+                    <td>BIGINT (Foreign Key)</td>
+                    <td>References <code>vendors.id</code>. Organizes items under a specific vendor.</td>
+                </tr>
+                <tr>
+                    <td><code>name</code></td>
+                    <td>VARCHAR(255)</td>
+                    <td>Category name (e.g. "Rice Dishes", "Drinks").</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- PAGE 6: DATABASE SCHEMA CONTINUED -->
+        <div class="page-break"></div>
+        <h3 class="subsection-title">4.2 Schema Tables Details (Continued)</h3>
+
+        <!-- Table 4: Menu Items -->
+        <h4 style="margin-bottom: 5px; color: var(--brand-dark);">4. Table: <code>menu_items</code></h4>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%">Column Name</th>
+                    <th style="width: 25%">Data Type</th>
+                    <th style="width: 50%">Description / Constraints</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>id</code></td>
+                    <td>BIGINT (Primary Key)</td>
+                    <td>Auto-incrementing menu item identifier.</td>
+                </tr>
+                <tr>
+                    <td><code>category_id</code></td>
+                    <td>BIGINT (Foreign Key)</td>
+                    <td>References <code>categories.id</code>. Connects item to its folder.</td>
+                </tr>
+                <tr>
+                    <td><code>name</code></td>
+                    <td>VARCHAR(255)</td>
+                    <td>Food item name (e.g., Spicy Jollof Rice).</td>
+                </tr>
+                <tr>
+                    <td><code>description</code></td>
+                    <td>TEXT (Nullable)</td>
+                    <td>Food item ingredients or description details.</td>
+                </tr>
+                <tr>
+                    <td><code>price</code></td>
+                    <td>DECIMAL(10,2)</td>
+                    <td>Price of the item (stored in Naira ₦).</td>
+                </tr>
+                <tr>
+                    <td><code>preparation_time</code></td>
+                    <td>INT (Nullable)</td>
+                    <td>Average food preparation time in minutes.</td>
+                </tr>
+                <tr>
+                    <td><code>image_url</code></td>
+                    <td>VARCHAR(2048)</td>
+                    <td>Storage upload path or remote Unsplash image link.</td>
+                </tr>
+                <tr>
+                    <td><code>is_available</code></td>
+                    <td>BOOLEAN</td>
+                    <td>Shows if item is in stock (Default: <code>true</code>).</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Table 5: Orders -->
+        <h4 style="margin-bottom: 5px; color: var(--brand-dark); margin-top: 20px;">5. Table: <code>orders</code></h4>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%">Column Name</th>
+                    <th style="width: 25%">Data Type</th>
+                    <th style="width: 50%">Description / Constraints</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>id</code></td>
+                    <td>BIGINT (Primary Key)</td>
+                    <td>Auto-incrementing unique order identifier.</td>
+                </tr>
+                <tr>
+                    <td><code>user_id</code></td>
+                    <td>BIGINT (Foreign Key)</td>
+                    <td>References <code>users.id</code> (The student placing the order).</td>
+                </tr>
+                <tr>
+                    <td><code>vendor_id</code></td>
+                    <td>BIGINT (Foreign Key)</td>
+                    <td>References <code>vendors.id</code> (The shop receiving the order).</td>
+                </tr>
+                <tr>
+                    <td><code>total_amount</code></td>
+                    <td>DECIMAL(10,2)</td>
+                    <td>Total cost of the transaction.</td>
+                </tr>
+                <tr>
+                    <td><code>status</code></td>
+                    <td>VARCHAR(50)</td>
+                    <td>Allowed states: <code>pending</code>, <code>preparing</code>, <code>ready</code>, <code>completed</code>, <code>cancelled</code>.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Table 6: Order Items -->
+        <h4 style="margin-bottom: 5px; color: var(--brand-dark); margin-top: 20px;">6. Table: <code>order_items</code></h4>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%">Column Name</th>
+                    <th style="width: 25%">Data Type</th>
+                    <th style="width: 50%">Description / Constraints</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>id</code></td>
+                    <td>BIGINT (Primary Key)</td>
+                    <td>Auto-incrementing line item identifier.</td>
+                </tr>
+                <tr>
+                    <td><code>order_id</code></td>
+                    <td>BIGINT (Foreign Key)</td>
+                    <td>References <code>orders.id</code>. Cascades on delete.</td>
+                </tr>
+                <tr>
+                    <td><code>menu_item_id</code></td>
+                    <td>BIGINT (Foreign Key)</td>
+                    <td>References <code>menu_items.id</code>. Keeps record of item details.</td>
+                </tr>
+                <tr>
+                    <td><code>quantity</code></td>
+                    <td>INT</td>
+                    <td>Quantity ordered.</td>
+                </tr>
+                <tr>
+                    <td><code>price</code></td>
+                    <td>DECIMAL(10,2)</td>
+                    <td>Snapshot price of the item at the exact moment of checkout.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- PAGE 7: LOCAL SETUP & VERIFICATION -->
+        <div class="page-break"></div>
+        <h2 class="section-title">5. Setup, Seeding &amp; Verification</h2>
+        
+        <h3 class="subsection-title">5.1 Database Seeding Architecture</h3>
+        <p>
+            QuickBite features a fully engineered <code>VendorSeeder</code> that automatically populates the database with realistic developer assets to make testing simple:
+        </p>
+        <ul>
+            <li><strong>10 Unique Campus Vendors:</strong> Includes specialized profiles representing diverse culinary options (Mama Titi's Kitchen, Burger Boss, Pizza Palace, Suya Spot, The Smoothie Bar, Campus Chops, Rice Republic, Noodle Hub, Grill &amp; Chill).</li>
+            <li><strong>46 Complete Menu Items:</strong> Realistic items matching each vendor's specialization, complete with prices, ingredients, and preparation times.</li>
+            <li><strong>Pre-matched High Definition Images:</strong> Image URLs pointing directly to specific Unsplash image IDs matching each category (e.g. actual pictures of pizzas, stir-fry noodles, smoothies, beef skewers), ensuring no empty spaces or broken thumbnails exist.</li>
+        </ul>
+
+        <h3 class="subsection-title">5.2 Testing Credentials</h3>
+        <p>
+            Use the following credentials to authenticate and verify the functional roles:
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 30%">Role</th>
+                    <th style="width: 40%">Email Address</th>
+                    <th style="width: 30%">Password</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Student User</strong></td>
+                    <td><code>student@quickbite.com</code></td>
+                    <td><code>password</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Mama Titi's Kitchen</strong></td>
+                    <td><code>mamatiti@quickbite.com</code></td>
+                    <td><code>password</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Burger Boss</strong></td>
+                    <td><code>burgerboss@quickbite.com</code></td>
+                    <td><code>password</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Pizza Palace</strong></td>
+                    <td><code>pizzapalace@quickbite.com</code></td>
+                    <td><code>password</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Suya Spot</strong></td>
+                    <td><code>suyaspot@quickbite.com</code></td>
+                    <td><code>password</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 class="subsection-title">5.3 Technical Verification Steps</h3>
+        <ol>
+            <li><strong>Authentication Validation:</strong> Test logging in as the student. Place an order from <em>Burger Boss</em>. Log out.</li>
+            <li><strong>Vendor Validation:</strong> Log in as `burgerboss@quickbite.com`. Confirm the order shows up immediately in the active orders queue. Verify the dashboard charts now show updated revenue and active order stats.</li>
+            <li><strong>Status Synchronization:</strong> Move the order status from <em>Pending</em> to <em>Preparing</em>. Log back in as the student and verify the student dashboard updates in real-time.</li>
+            <li><strong>Responsive Check:</strong> Shrink the browser window size to phone widths and verify the navigation headers collapse and the menus scale correctly.</li>
+        </ol>
+
+        <!-- PAGE 8: SUMMARY & FUTURE DEVELOPMENTS -->
+        <div class="page-break"></div>
+        <h2 class="section-title">6. Concluding Remarks &amp; Future Scope</h2>
+        <p>
+            QuickBite successfully demonstrates a modern, high-performance web platform tailored for the campus ecosystem. By adopting a monolithic SPA approach utilizing Laravel, InertiaJS, and React, the system achieves instant responsiveness without requiring complex multi-repo management.
+        </p>
+        <p>
+            The interface focuses heavily on user experience, adopting spacing techniques, clear indicators, responsive grid design, and clean image pairings.
+        </p>
+
+        <h3 class="subsection-title">6.1 Proposed Future Scope</h3>
+        <ul>
+            <li><strong>Real-time WebSockets:</strong> Integrating Laravel Reverb or Pusher to push orders to the vendor dashboard and updates to students in real-time without browser reloading.</li>
+            <li><strong>Payment Gateway Integration:</strong> Linking Paystack or Flutterwave payment APIs to support live student wallets and automated vendor payouts.</li>
+            <li><strong>Interactive Campus Map:</strong> Implementing Leaflet.js or Google Maps API to visually display location checkpoints for vendors and students.</li>
+            <li><strong>Vendor Analytics Graphs:</strong> Expanding the dashboard analytics to display line charts showing weekly or monthly revenue trends.</li>
+        </ul>
+
+    </div>
+
+</body>
+</html>
