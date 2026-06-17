@@ -65,43 +65,78 @@ export default function Browse({ vendors }) {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Vendors List */}
                 <div className={`${selectedVendor ? 'lg:col-span-4 hidden lg:block' : 'lg:col-span-12'} space-y-6`}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className={`grid gap-6 ${selectedVendor ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
                         {vendors.length === 0 && (
                             <div className="col-span-full py-20 text-center">
                                 <p className="text-gray-400 italic text-xl font-medium">No vendors are open right now. Check back later!</p>
                             </div>
                         )}
-                        {vendors.map((vendor) => (
-                            <div 
-                                key={vendor.id} 
-                                onClick={() => setSelectedVendor(vendor)}
-                                className={`bg-white rounded-3xl p-6 shadow-sm border transition-all cursor-pointer group hover:shadow-premium ${
-                                    selectedVendor?.id === vendor.id ? 'border-brand-primary ring-1 ring-brand-primary' : 'border-gray-100'
-                                }`}
-                            >
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="bg-brand-primary/10 p-3 rounded-2xl group-hover:bg-brand-primary/20 transition-colors">
-                                        <MapPin className="w-6 h-6 text-brand-primary" />
-                                    </div>
-                                    <div className="flex items-center gap-1 bg-yellow-400/10 px-2 py-1 rounded-lg">
-                                        <Star className="w-4 h-4 text-yellow-600 fill-yellow-600" />
-                                        <span className="text-xs font-bold text-yellow-700">4.8</span>
+                        {vendors.map((vendor) => {
+                            const isSelected = selectedVendor?.id === vendor.id;
+                            return (
+                                <div 
+                                    key={vendor.id} 
+                                    onClick={() => setSelectedVendor(vendor)}
+                                    className={`bg-white rounded-3xl transition-all cursor-pointer group border ${
+                                        isSelected 
+                                            ? 'border-brand-primary ring-1 ring-brand-primary shadow-sm bg-brand-surface' 
+                                            : 'border-gray-100 hover:shadow-premium hover:border-gray-200'
+                                    } ${selectedVendor ? 'p-4' : 'p-6'}`}
+                                >
+                                    <div className={`flex ${selectedVendor ? 'items-center gap-4' : 'flex-col gap-4'}`}>
+                                        {/* Icon & Rating */}
+                                        <div className="flex justify-between items-center w-full">
+                                            <div className="flex items-center gap-3">
+                                                <div className="bg-brand-primary/10 p-3 rounded-2xl group-hover:bg-brand-primary/20 transition-colors flex-shrink-0">
+                                                    <MapPin className="w-6 h-6 text-brand-primary" />
+                                                </div>
+                                                {selectedVendor && (
+                                                    <div className="min-w-0">
+                                                        <h3 className="text-sm md:text-base font-bold text-brand-dark group-hover:text-brand-primary transition-colors line-clamp-1">
+                                                            {vendor.name}
+                                                        </h3>
+                                                        <div className="flex items-center gap-1 mt-0.5">
+                                                            <Star className="w-3.5 h-3.5 text-yellow-600 fill-yellow-600" />
+                                                            <span className="text-xs font-bold text-yellow-700">4.8</span>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {!selectedVendor && (
+                                                <div className="flex items-center gap-1 bg-yellow-400/10 px-2 py-1 rounded-lg">
+                                                    <Star className="w-4 h-4 text-yellow-600 fill-yellow-600" />
+                                                    <span className="text-xs font-bold text-yellow-700">4.8</span>
+                                                </div>
+                                            )}
+                                            {selectedVendor && (
+                                                <div className="ml-auto flex-shrink-0">
+                                                    <ChevronRight className={`w-5 h-5 transition-transform ${isSelected ? 'text-brand-primary translate-x-1' : 'text-gray-400'}`} />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {!selectedVendor && (
+                                            <>
+                                                <div>
+                                                    <h3 className="text-xl font-bold text-brand-dark group-hover:text-brand-primary transition-colors mb-2">
+                                                        {vendor.name}
+                                                    </h3>
+                                                    <p className="text-sm text-gray-500 line-clamp-2">
+                                                        {vendor.description || 'No description provided.'}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                                                    <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full uppercase">Open Now</span>
+                                                    <div className="flex items-center text-brand-primary font-bold text-sm">
+                                                        View Menu <ChevronRight className="w-4 h-4" />
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
-                                <h3 className="text-xl font-bold text-brand-dark group-hover:text-brand-primary transition-colors mb-2">
-                                    {vendor.name}
-                                </h3>
-                                <p className="text-sm text-gray-500 line-clamp-2 mb-4">
-                                    {vendor.description || 'No description provided.'}
-                                </p>
-                                <div className="flex items-center justify-between pt-4 border-t border-gray-50">
-                                    <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full uppercase">Open Now</span>
-                                    <div className="flex items-center text-brand-primary font-bold text-sm">
-                                        View Menu <ChevronRight className="w-4 h-4" />
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
 
