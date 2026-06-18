@@ -485,7 +485,7 @@
         <p>
             Traditional SPAs require separate client router systems and complex state fetch libraries (e.g., Redux, Axios client configurations). QuickBite bypasses this using Inertia.js. Below is the transaction sequence:
         </p>
-        <div class="diagram-box" style="text-align: left; font-family: monospace; font-size: 13px; line-height: 1.4;">
+        <div class="diagram-box" style="text-align: left; font-family: monospace; font-size: 13px; line-height: 1.4; margin-bottom: 30px;">
             [Browser / Client] ──(HTTP GET Request: /browse)──&gt; [Laravel Web Router]<br>
             [React UI State]   &lt;──(Inertia React Component + JSON)── [BrowseController]<br>
                                                                      │<br>
@@ -493,6 +493,36 @@
                                                                      ▼<br>
                                                                 [MySQL DB]
         </div>
+
+        <h3 class="subsection-title">3.2 Frontend Implementation &amp; Tools Details</h3>
+        <p>
+            QuickBite's frontend utilizes a decoupled development structure compiled into static assets by Vite, and served by Laravel's routing engine. Below is the technical breakdown of the UI systems, page configurations, and libraries that form the frontend application:
+        </p>
+        
+        <h4 style="margin-bottom: 5px; color: var(--brand-dark); font-size: 14px;">1. UI Rendering Engine: React 18</h4>
+        <p>
+            React is employed to build interactive, stateful panels. It maintains internal components' local state, enabling instant updates for features such as adjusting item quantities in the shopping cart (<code>cart</code> state hook), filtering and search inputs, active vendor selection sidebar transitions (<code>selectedVendor</code> state hook), and updating order processing states without complete document reloads.
+        </p>
+
+        <h4 style="margin-bottom: 5px; color: var(--brand-dark); font-size: 14px;">2. Development &amp; Assets Compilation: Vite</h4>
+        <p>
+            Vite replaces legacy Webpack systems to manage hot module replacement (HMR) and assets compilation. Frontend assets, including Javascript (JSX) modules, component dependencies, SVG icons, and Tailwind stylesheets, are processed and optimized in milliseconds by Vite, resulting in zero-lag development updates and fast production bundles.
+        </p>
+
+        <h4 style="margin-bottom: 5px; color: var(--brand-dark); font-size: 14px;">3. Frontend-Backend Connector: Inertia.js</h4>
+        <p>
+            QuickBite uses Inertia.js as a unified middleware bridge, eliminating the overhead of building independent APIs (such as REST or GraphQL configurations) and client-side routers (such as React Router). 
+            When a user navigates to a route, Laravel processes the request, loads SQL database rows, and renders the target React page dynamically by passing data variables directly as standard React <code>props</code>:
+        </p>
+        <pre><code>// Example Laravel controller response passing data directly to React props:
+return Inertia::render('Student/Browse', [
+    'vendors' => $vendors
+]);</code></pre>
+
+        <h4 style="margin-bottom: 5px; color: var(--brand-dark); font-size: 14px;">4. Styling &amp; Component Layout: Tailwind CSS &amp; Lucide Icons</h4>
+        <p>
+            Styles are constructed using Tailwind CSS utility tokens. Custom panels are styled using absolute positions, glassmorphism filters (e.g. <code>backdrop-blur-sm bg-white/80</code>), and transitions. Lucide React provides clean, high-performance SVG vector icons (e.g., <code>ShoppingCart</code>, <code>Star</code>, <code>Search</code>, <code>MapPin</code>) to guide navigation across student and vendor flows.
+        </p>
 
         <!-- PAGE 5: DATABASE SCHEMA & ENTITIES -->
         <div class="page-break"></div>
