@@ -67,6 +67,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/vendor/menu/category/{category}', [MenuController::class, 'destroyCategory'])->name('vendor.category.destroy');
     Route::post('/vendor/menu/item', [MenuController::class, 'storeItem'])->name('vendor.item.store');
     Route::delete('/vendor/menu/item/{item}', [MenuController::class, 'destroyItem'])->name('vendor.item.destroy');
+    Route::patch('/vendor/menu/item/{item}/toggle', [MenuController::class, 'toggleItemAvailability'])->name('vendor.item.toggle');
 });
 
 require __DIR__.'/auth.php';

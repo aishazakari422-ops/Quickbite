@@ -36,6 +36,15 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Dashboard
                                 </NavLink>
+                                {user.role === 'student' && (
+                                    <NavLink
+                                        href={route('student.browse')}
+                                        active={route().current('student.browse')}
+                                        className="text-brand-dark hover:text-brand-primary"
+                                    >
+                                        Browse Food
+                                    </NavLink>
+                                )}
                                 {user.role === 'vendor' && (
                                     <NavLink
                                         href={route('vendor.menu')}

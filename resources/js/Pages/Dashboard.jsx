@@ -63,17 +63,17 @@ export default function Dashboard({ hasShop, orders = [], analytics = null }) {
                                         <div className="p-6 bg-brand-surface border-b border-gray-100 flex justify-between items-center">
                                             <div>
                                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-tighter">Order #{order.id}</p>
-                                                <p className="font-black text-brand-dark">{order.user.name}</p>
+                                                <p className="font-black text-brand-dark">{order.user?.name || 'Customer'}</p>
                                             </div>
                                             <span className={`text-[10px] font-black px-3 py-1.5 rounded-full uppercase ${getStatusColor(order.status)}`}>
                                                 {order.status}
                                             </span>
                                         </div>
                                         <div className="p-6 space-y-3">
-                                            {order.items.map((item) => (
+                                            {order.items?.map((item) => (
                                                 <div key={item.id} className="flex justify-between text-sm">
                                                     <span className="text-gray-600">
-                                                        <span className="font-bold text-brand-dark">{item.quantity}x</span> {item.menu_item.name}
+                                                        <span className="font-bold text-brand-dark">{item.quantity}x</span> {item.menu_item?.name || item.menuItem?.name || 'Item'}
                                                     </span>
                                                     <span className="font-bold text-brand-dark">₦{(item.price * item.quantity).toLocaleString()}</span>
                                                 </div>
@@ -115,6 +115,7 @@ export default function Dashboard({ hasShop, orders = [], analytics = null }) {
                         )}
                     </div>
                 )}
+
                 {/* Hero Section */}
                 <div className="bg-white rounded-3xl p-8 shadow-premium border border-gray-100 flex flex-col md:flex-row items-center justify-between overflow-hidden relative">
                     <div className="z-10 max-w-lg">
@@ -147,17 +148,17 @@ export default function Dashboard({ hasShop, orders = [], analytics = null }) {
                                     <div className="p-6 bg-brand-surface border-b border-gray-100 flex justify-between items-center">
                                         <div>
                                             <p className="text-xs font-bold text-gray-400 uppercase tracking-tighter">Order #{order.id}</p>
-                                            <p className="font-black text-brand-dark">{order.vendor.name}</p>
+                                            <p className="font-black text-brand-dark">{order.vendor?.name || 'Vendor'}</p>
                                         </div>
                                         <span className={`text-[10px] font-black px-3 py-1.5 rounded-full uppercase ${getStatusColor(order.status)}`}>
                                             {order.status}
                                         </span>
                                     </div>
                                     <div className="p-6 space-y-3">
-                                        {order.items.map((item) => (
+                                        {order.items?.map((item) => (
                                             <div key={item.id} className="flex justify-between text-sm">
                                                 <span className="text-gray-600">
-                                                    <span className="font-bold text-brand-dark">{item.quantity}x</span> {item.menu_item.name}
+                                                    <span className="font-bold text-brand-dark">{item.quantity}x</span> {item.menu_item?.name || item.menuItem?.name || 'Item'}
                                                 </span>
                                             </div>
                                         ))}

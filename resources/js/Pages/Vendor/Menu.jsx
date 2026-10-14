@@ -62,6 +62,12 @@ export default function Menu({ vendor, categories }) {
         }
     };
 
+    const toggleAvailability = (id) => {
+        router.patch(route('vendor.item.toggle', id), {}, {
+            preserveScroll: true,
+        });
+    };
+
     const deleteItem = (id) => {
         if (confirm('Are you sure you want to delete this item?')) {
             router.delete(route('vendor.item.destroy', id));
@@ -266,13 +272,26 @@ export default function Menu({ vendor, categories }) {
                                                     )}
                                                 </div>
                                             </div>
-                                            <div className="text-right">
-                                                <p className="text-xl font-black text-brand-primary">₦{item.price}</p>
-                                                <div className="flex gap-2 mt-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button className="text-gray-400 hover:text-brand-secondary"><Edit2 className="w-4 h-4" /></button>
+                                            <div className="text-right flex flex-col items-end gap-1.5">
+                                                <p className="text-xl font-black text-brand-primary">₦{Number(item.price).toLocaleString()}</p>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => toggleAvailability(item.id)}
+                                                    className={`text-xs font-bold px-3 py-1 rounded-full border transition-all ${
+                                                        item.is_available
+                                                            ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                                                            : "bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
+                                                    }`}
+                                                    title="Click to toggle availability"
+                                                >
+                                                    {item.is_available ? "● In Stock" : "○ Sold Out"}
+                                                </button>
+                                                <div className="flex gap-2 mt-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button 
+                                                        type="button"
                                                         onClick={() => deleteItem(item.id)}
-                                                        className="text-gray-400 hover:text-red-500"
+                                                        className="text-gray-400 hover:text-red-500 p-1"
+                                                        title="Delete item"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>

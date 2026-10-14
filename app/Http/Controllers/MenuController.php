@@ -110,6 +110,23 @@ class MenuController extends Controller
     }
 
     /**
+     * Toggle availability of a specific menu item.
+     */
+    public function toggleItemAvailability(MenuItem $item)
+    {
+        // Ensure vendor owns this item
+        if ($item->category && $item->category->vendor_id === Auth::user()->vendor?->id) {
+            $item->update([
+                'is_available' => !$item->is_available,
+            ]);
+            $status = $item->is_available ? 'in stock' : 'sold out';
+            return back()->with('message', "Item marked as {$status}!");
+        }
+
+        return back()->with('error', 'Unauthorized action.');
+    }
+
+    /**
      * Delete a specific menu item.
      */
     public function destroyItem(MenuItem $item)

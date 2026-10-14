@@ -1,15 +1,36 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
-import { Search, MapPin, Star, ChevronRight, ShoppingCart, X, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { Search, MapPin, Star, ChevronRight, ShoppingCart, X, Trash2, Plus, Minus } from 'lucide-react';
+import { useState, useMemo } from 'react';
 
-export default function Browse({ vendors }) {
+export default function Browse({ vendors = [] }) {
     const [selectedVendor, setSelectedVendor] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
     const [cart, setCart] = useState([]);
     const [showCart, setShowCart] = useState(false);
 
+    // Live search filter across vendors and food menus
+    const filteredVendors = useMemo(() => {
+        if (!searchQuery.trim()) return vendors;
+        const q = searchQuery.toLowerCase().trim();
+        return vendors.filter(vendor => {
+            const nameMatch = vendor.name?.toLowerCase().includes(q);
+            const descMatch = vendor.description?.toLowerCase().includes(q);
+            const menuMatch = vendor.categories?.some(cat => 
+                cat.name?.toLowerCase().includes(q) ||
+                cat.items?.some(item => 
+                    item.name?.toLowerCase().includes(q) ||
+                    item.description?.toLowerCase().includes(q)
+                )
+            );
+            return nameMatch || descMatch || menuMatch;
+        });
+    }, [vendors, searchQuery]);
+
     const addToCart = (item, vendor) => {
-        // If adding from a different vendor, clear the cart (typical food app logic)
+        if (item.is_available === false) return;
+
+        // If adding from a different vendor, prompt user
         if (cart.length > 0 && cart[0].vendor_id !== vendor.id) {
             if (confirm('Adding items from a different vendor will clear your current cart. Continue?')) {
                 setCart([{ ...item, quantity: 1, vendor_id: vendor.id, vendor_name: vendor.name }]);
@@ -23,6 +44,18 @@ export default function Browse({ vendors }) {
                 return prevCart.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
             }
             return [...prevCart, { ...item, quantity: 1, vendor_id: vendor.id, vendor_name: vendor.name }];
+        });
+    };
+
+    const updateQuantity = (itemId, delta) => {
+        setCart(prevCart => {
+            return prevCart.map(item => {
+                if (item.id === itemId) {
+                    const newQty = item.quantity + delta;
+                    return newQty > 0 ? { ...item, quantity: newQty } : null;
+                }
+                return item;
+            }).filter(Boolean);
         });
     };
 
@@ -42,6 +75,21 @@ export default function Browse({ vendors }) {
         });
     };
 
+    // Filter categories of selected vendor based on search query
+    const displayCategories = useMemo(() => {
+        if (!selectedVendor) return [];
+        if (!searchQuery.trim()) return selectedVendor.categories || [];
+        const q = searchQuery.toLowerCase().trim();
+        return (selectedVendor.categories || []).map(cat => ({
+            ...cat,
+            items: (cat.items || []).filter(item => 
+                item.name?.toLowerCase().includes(q) ||
+                item.description?.toLowerCase().includes(q) ||
+                cat.name?.toLowerCase().includes(q)
+            )
+        })).filter(cat => cat.items.length > 0);
+    }, [selectedVendor, searchQuery]);
+
     return (
         <AuthenticatedLayout
             header={
@@ -53,9 +101,19 @@ export default function Browse({ vendors }) {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input 
                             type="text" 
-                            placeholder="Search for vendors or food..."
-                            className="w-full pl-10 pr-4 py-2 bg-white border-gray-200 rounded-xl focus:border-brand-primary focus:ring-brand-primary shadow-sm"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search vendors or dishes (e.g. rice, burger)..."
+                            className="w-full pl-10 pr-10 py-2.5 bg-white border-gray-200 rounded-xl focus:border-brand-primary focus:ring-brand-primary shadow-sm text-sm"
                         />
+                        {searchQuery && (
+                            <button 
+                                onClick={() => setSearchQuery('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        )}
                     </div>
                 </div>
             }
@@ -65,13 +123,26 @@ export default function Browse({ vendors }) {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Vendors List */}
                 <div className={`${selectedVendor ? 'lg:col-span-4 hidden lg:block' : 'lg:col-span-12'} space-y-6`}>
+                    {searchQuery && (
+                        <div className="flex items-center justify-between text-sm text-gray-500 bg-white p-3 rounded-2xl border border-gray-100">
+                            <span>Found <strong>{filteredVendors.length}</strong> {filteredVendors.length === 1 ? 'vendor' : 'vendors'} matching "{searchQuery}"</span>
+                            <button onClick={() => setSearchQuery('')} className="text-brand-primary font-bold hover:underline text-xs">Clear</button>
+                        </div>
+                    )}
+
                     <div className={`grid gap-6 ${selectedVendor ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
-                        {vendors.length === 0 && (
-                            <div className="col-span-full py-20 text-center">
-                                <p className="text-gray-400 italic text-xl font-medium">No vendors are open right now. Check back later!</p>
+                        {filteredVendors.length === 0 && (
+                            <div className="col-span-full py-16 text-center bg-white rounded-3xl border border-gray-100 p-8">
+                                <p className="text-gray-400 italic text-lg font-medium">No vendors found matching your search.</p>
+                                <button 
+                                    onClick={() => setSearchQuery('')}
+                                    className="mt-4 px-4 py-2 bg-brand-primary/10 text-brand-primary font-bold rounded-xl text-sm hover:bg-brand-primary/20 transition-colors"
+                                >
+                                    Reset Search
+                                </button>
                             </div>
                         )}
-                        {vendors.map((vendor) => {
+                        {filteredVendors.map((vendor) => {
                             const isSelected = selectedVendor?.id === vendor.id;
                             return (
                                 <div 
@@ -126,9 +197,9 @@ export default function Browse({ vendors }) {
                                                     </p>
                                                 </div>
                                                 <div className="flex items-center justify-between pt-4 border-t border-gray-50">
-                                                    <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full uppercase">Open Now</span>
+                                                    <span className="text-xs font-bold text-green-600 bg-green-50 px-2.5 py-1 rounded-full uppercase">Open Now</span>
                                                     <div className="flex items-center text-brand-primary font-bold text-sm">
-                                                        View Menu <ChevronRight className="w-4 h-4" />
+                                                        View Menu <ChevronRight className="w-4 h-4 ml-1" />
                                                     </div>
                                                 </div>
                                             </>
@@ -149,6 +220,7 @@ export default function Browse({ vendors }) {
                                 <button 
                                     onClick={() => setSelectedVendor(null)}
                                     className="absolute top-4 right-4 bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors"
+                                    title="Close Menu"
                                 >
                                     <X className="w-5 h-5" />
                                 </button>
@@ -165,22 +237,36 @@ export default function Browse({ vendors }) {
 
                             {/* Menu Items */}
                             <div className="p-6 md:p-8">
-                                {selectedVendor.categories.length === 0 ? (
-                                    <p className="text-center py-10 text-gray-400 italic">This vendor hasn't added any menu items yet.</p>
+                                {displayCategories.length === 0 ? (
+                                    <div className="text-center py-12 text-gray-400">
+                                        <p className="italic font-medium">No menu items match your search for this vendor.</p>
+                                        {searchQuery && (
+                                            <button 
+                                                onClick={() => setSearchQuery('')}
+                                                className="mt-3 text-brand-primary font-bold hover:underline text-sm"
+                                            >
+                                                Clear search filter
+                                            </button>
+                                        )}
+                                    </div>
                                 ) : (
                                     <div className="space-y-8">
-                                        {selectedVendor.categories.map((category) => (
+                                        {displayCategories.map((category) => (
                                             <div key={category.id}>
                                                 <h4 className="text-xs font-black uppercase tracking-[0.2em] text-brand-primary mb-4 flex items-center gap-3">
                                                     <span className="w-6 h-px bg-brand-primary/40"></span>
                                                     {category.name}
-                                                    <span className="text-gray-300 font-bold normal-case tracking-normal">({category.items.length})</span>
+                                                    <span className="text-gray-400 font-bold normal-case tracking-normal">({category.items.length})</span>
                                                 </h4>
                                                 <div className="space-y-3">
                                                     {category.items.map((item) => (
                                                         <div 
                                                             key={item.id} 
-                                                            className="flex items-center gap-4 p-4 rounded-2xl border border-gray-100 bg-brand-surface hover:border-brand-primary/30 hover:shadow-sm transition-all group"
+                                                            className={`flex items-center gap-4 p-4 rounded-2xl border transition-all group ${
+                                                                item.is_available === false 
+                                                                    ? 'bg-gray-50/70 border-gray-100 opacity-60' 
+                                                                    : 'bg-brand-surface border-gray-100 hover:border-brand-primary/30 hover:shadow-sm'
+                                                            }`}
                                                         >
                                                             {/* Thumbnail */}
                                                             {item.image_url && (
@@ -195,9 +281,16 @@ export default function Browse({ vendors }) {
 
                                                             {/* Info */}
                                                             <div className="flex-1 min-w-0">
-                                                                <h5 className="font-bold text-brand-dark group-hover:text-brand-primary transition-colors text-sm md:text-base">
-                                                                    {item.name}
-                                                                </h5>
+                                                                <div className="flex items-center gap-2">
+                                                                    <h5 className="font-bold text-brand-dark group-hover:text-brand-primary transition-colors text-sm md:text-base">
+                                                                        {item.name}
+                                                                    </h5>
+                                                                    {item.is_available === false && (
+                                                                        <span className="text-[10px] font-black uppercase bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
+                                                                            Sold Out
+                                                                        </span>
+                                                                    )}
+                                                                </div>
                                                                 <p className="text-xs text-gray-400 mt-1 line-clamp-1">
                                                                     {item.description}
                                                                 </p>
@@ -214,13 +307,19 @@ export default function Browse({ vendors }) {
                                                             </div>
 
                                                             {/* Add Button */}
-                                                            <button 
-                                                                onClick={() => addToCart(item, selectedVendor)}
-                                                                className="flex-shrink-0 w-10 h-10 md:w-auto md:h-auto md:px-5 md:py-2.5 bg-white border border-gray-200 rounded-xl font-bold text-sm text-brand-dark hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all flex items-center justify-center gap-2"
-                                                            >
-                                                                <ShoppingCart className="w-4 h-4" />
-                                                                <span className="hidden md:inline">Add</span>
-                                                            </button>
+                                                            {item.is_available === false ? (
+                                                                <span className="text-xs font-bold text-gray-400 px-4 py-2 bg-gray-100 rounded-xl">
+                                                                    Unavailable
+                                                                </span>
+                                                            ) : (
+                                                                <button 
+                                                                    onClick={() => addToCart(item, selectedVendor)}
+                                                                    className="flex-shrink-0 w-10 h-10 md:w-auto md:h-auto md:px-5 md:py-2.5 bg-white border border-gray-200 rounded-xl font-bold text-sm text-brand-dark hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all flex items-center justify-center gap-2 shadow-sm"
+                                                                >
+                                                                    <ShoppingCart className="w-4 h-4" />
+                                                                    <span className="hidden md:inline">Add</span>
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     ))}
                                                 </div>
@@ -241,32 +340,53 @@ export default function Browse({ vendors }) {
                         <div className="p-8 bg-brand-dark text-white flex justify-between items-center">
                             <div>
                                 <h3 className="text-2xl font-black">Your <span className="text-brand-primary">Basket</span></h3>
-                                <p className="text-gray-400 text-sm">{cart[0]?.vendor_name}</p>
+                                <p className="text-gray-400 text-sm mt-0.5">{cart[0]?.vendor_name}</p>
                             </div>
                             <button onClick={() => setShowCart(false)} className="bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors">
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
                         
-                        <div className="p-8 max-h-[60vh] overflow-y-auto space-y-6">
+                        <div className="p-8 max-h-[60vh] overflow-y-auto space-y-4">
                             {cart.map((item) => (
-                                <div key={item.id} className="flex justify-between items-center group">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-brand-surface rounded-xl flex items-center justify-center font-black text-brand-primary">
-                                            {item.quantity}x
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-brand-dark">{item.name}</p>
-                                            <p className="text-xs text-gray-400">₦{item.price.toLocaleString()} each</p>
-                                        </div>
+                                <div key={item.id} className="flex justify-between items-center p-3 rounded-2xl border border-gray-50 bg-gray-50/50 group">
+                                    <div className="flex-1 min-w-0 pr-4">
+                                        <p className="font-bold text-brand-dark truncate">{item.name}</p>
+                                        <p className="text-xs text-gray-400">₦{Number(item.price).toLocaleString()} each</p>
                                     </div>
-                                    <div className="flex items-center gap-4">
-                                        <p className="font-black text-brand-dark">₦{(item.price * item.quantity).toLocaleString()}</p>
+
+                                    {/* Quantity Stepper */}
+                                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl p-1 shadow-sm">
+                                        <button 
+                                            type="button"
+                                            onClick={() => updateQuantity(item.id, -1)}
+                                            className="w-7 h-7 rounded-lg bg-gray-50 hover:bg-brand-primary hover:text-white flex items-center justify-center font-bold text-gray-600 transition-colors"
+                                            title="Decrease quantity"
+                                        >
+                                            <Minus className="w-3.5 h-3.5" />
+                                        </button>
+                                        <span className="w-6 text-center font-black text-brand-primary text-sm">
+                                            {item.quantity}
+                                        </span>
+                                        <button 
+                                            type="button"
+                                            onClick={() => updateQuantity(item.id, 1)}
+                                            className="w-7 h-7 rounded-lg bg-gray-50 hover:bg-brand-primary hover:text-white flex items-center justify-center font-bold text-gray-600 transition-colors"
+                                            title="Increase quantity"
+                                        >
+                                            <Plus className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+
+                                    {/* Item Total & Delete */}
+                                    <div className="flex items-center gap-3 pl-4">
+                                        <p className="font-black text-brand-dark text-sm w-20 text-right">₦{(item.price * item.quantity).toLocaleString()}</p>
                                         <button 
                                             onClick={() => removeFromCart(item.id)}
-                                            className="text-gray-300 hover:text-red-500 transition-colors"
+                                            className="text-gray-300 hover:text-red-500 transition-colors p-1"
+                                            title="Remove item"
                                         >
-                                            <Trash2 className="w-5 h-5" />
+                                            <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
                                 </div>
@@ -281,7 +401,7 @@ export default function Browse({ vendors }) {
                             <div className="flex gap-4">
                                 <button 
                                     onClick={() => setCart([])}
-                                    className="flex-1 py-4 text-gray-400 font-bold hover:text-red-500 transition-colors"
+                                    className="flex-1 py-4 text-gray-400 font-bold hover:text-red-500 transition-colors text-sm"
                                 >
                                     Empty Cart
                                 </button>
@@ -307,7 +427,7 @@ export default function Browse({ vendors }) {
                         <div className="flex items-center gap-4">
                             <div className="relative">
                                 <ShoppingCart className="w-8 h-8 text-brand-primary" />
-                                <span className="absolute -top-2 -right-2 bg-white text-brand-dark text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center">
+                                <span className="absolute -top-2 -right-2 bg-white text-brand-dark text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow">
                                     {cart.reduce((sum, item) => sum + item.quantity, 0)}
                                 </span>
                             </div>
@@ -317,7 +437,7 @@ export default function Browse({ vendors }) {
                             </div>
                         </div>
                         <button 
-                            className="bg-brand-primary px-8 py-3 rounded-2xl font-black text-sm"
+                            className="bg-brand-primary px-8 py-3 rounded-2xl font-black text-sm hover:brightness-110 transition"
                         >
                             View Cart
                         </button>
